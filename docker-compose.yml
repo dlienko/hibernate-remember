@@ -1,0 +1,22 @@
+version: '2.1'
+
+services:
+  web:
+    image: dlienko/hibernate-remember
+    ports:
+      - 8880:8080
+    links:
+      - db:db
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: yoga_db
+      DB_USER: docker
+      DB_PASSWORD: docker
+
+  db:
+    image: postgres:9.4
+    environment:
+      POSTGRES_USER: docker
+      POSTGRES_PASSWORD: docker
+      POSTGRES_DB: yoga_db
