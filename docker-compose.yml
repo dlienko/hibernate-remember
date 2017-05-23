@@ -2,7 +2,7 @@ version: '2.1'
 
 services:
   web:
-    image: dlienko/hibernate-remember
+    image: dlienko/yoga-db
     ports:
       - 8880:8080
     links:
