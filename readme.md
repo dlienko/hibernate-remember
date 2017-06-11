@@ -58,6 +58,28 @@ Response:
 }
 ```
 
+#### Update
+
+Request:
+```
+POST /api/v1/exercises/{id}
+
+{
+    "name": "some other name",
+    "description": "description"
+}
+```
+
+Response:
+```
+{
+    "id": 1,
+    "name": "some other name",
+    "description": "description"
+}
+```
+
+
 #### Delete
 
 Request:

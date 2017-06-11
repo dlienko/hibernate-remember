@@ -2,19 +2,23 @@ package com.github.dlienko.yoga.controller;
 
 import static java.lang.invoke.MethodHandles.lookup;
 import static org.slf4j.LoggerFactory.getLogger;
+import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,7 +27,10 @@ import com.github.dlienko.yoga.model.Exercise;
 import com.github.dlienko.yoga.repository.ExerciseRepository;
 
 @RestController
-@RequestMapping("/v1/exercises")
+@RequestMapping(
+        path = "/v1/exercises",
+        consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
+        produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 public class ExerciseController {
 
     private final Logger log = getLogger(lookup().lookupClass());
@@ -35,28 +42,18 @@ public class ExerciseController {
         this.exerciseRepository = exerciseRepository;
     }
 
-    @RequestMapping(
-            method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ResponseBody
+    @GetMapping
     public Iterable<Exercise> getAll() {
         return exerciseRepository.findAll();
     }
 
-    @RequestMapping(
-            path = "/{id}",
-            method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ResponseBody
+    @GetMapping(path = "/{id}")
     public Exercise getById(@PathVariable(value = "id") Long id) {
         return exerciseRepository.findOne(id);
     }
 
-    @RequestMapping(
-            method = RequestMethod.POST,
-            consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ResponseBody
+    @PostMapping
+    @ResponseStatus(CREATED)
     public Exercise create(@RequestBody CreateExercise request) {
         Exercise entity = Exercise.builder()
                 .name(request.getName())
@@ -68,10 +65,21 @@ public class ExerciseController {
         return exerciseRepository.save(entity);
     }
 
-    @RequestMapping(
-            path = "/{id}",
-            method = RequestMethod.DELETE)
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PutMapping(path = "/{id}")
+    public Exercise update(@RequestBody CreateExercise request, @PathVariable(value = "id") Long id) {
+        Exercise entity = Exercise.builder()
+                .id(id)
+                .name(request.getName())
+                .description(request.getDescription())
+                .build();
+
+        log.info("Updating entity: {}", entity);
+
+        return exerciseRepository.save(entity);
+    }
+
+    @DeleteMapping(path = "/{id}")
+    @ResponseStatus(NO_CONTENT)
     public void delete(@PathVariable(value = "id") Long id) {
         exerciseRepository.delete(id);
     }
@@ -79,7 +87,7 @@ public class ExerciseController {
     @ExceptionHandler(EmptyResultDataAccessException.class)
     public ResponseEntity<Void> handleError(EmptyResultDataAccessException e) {
         log.warn("No resource found", e);
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(NOT_FOUND);
     }
 
 }
