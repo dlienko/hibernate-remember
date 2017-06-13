@@ -29,7 +29,6 @@ import com.github.dlienko.yoga.repository.ExerciseRepository;
 @RestController
 @RequestMapping(
         path = "/v1/exercises",
-        consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
         produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 public class ExerciseController {
 
@@ -52,7 +51,7 @@ public class ExerciseController {
         return exerciseRepository.findOne(id);
     }
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseStatus(CREATED)
     public Exercise create(@RequestBody CreateExercise request) {
         Exercise entity = Exercise.builder()
@@ -65,7 +64,7 @@ public class ExerciseController {
         return exerciseRepository.save(entity);
     }
 
-    @PutMapping(path = "/{id}")
+    @PutMapping(path = "/{id}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public Exercise update(@RequestBody CreateExercise request, @PathVariable(value = "id") Long id) {
         Exercise entity = Exercise.builder()
                 .id(id)
