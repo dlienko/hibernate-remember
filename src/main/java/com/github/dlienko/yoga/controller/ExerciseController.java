@@ -5,11 +5,11 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -29,7 +29,7 @@ import com.github.dlienko.yoga.repository.ExerciseRepository;
 @RestController
 @RequestMapping(
         path = "/v1/exercises",
-        produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+        produces = APPLICATION_JSON_UTF8_VALUE)
 public class ExerciseController {
 
     private final Logger log = getLogger(lookup().lookupClass());
@@ -51,7 +51,7 @@ public class ExerciseController {
         return exerciseRepository.findOne(id);
     }
 
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @PostMapping(consumes = APPLICATION_JSON_UTF8_VALUE)
     @ResponseStatus(CREATED)
     public Exercise create(@RequestBody CreateExercise request) {
         Exercise entity = Exercise.builder()
@@ -64,7 +64,7 @@ public class ExerciseController {
         return exerciseRepository.save(entity);
     }
 
-    @PutMapping(path = "/{id}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @PutMapping(path = "/{id}", consumes = APPLICATION_JSON_UTF8_VALUE)
     public Exercise update(@RequestBody CreateExercise request, @PathVariable(value = "id") Long id) {
         Exercise entity = Exercise.builder()
                 .id(id)

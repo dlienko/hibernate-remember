@@ -8,6 +8,10 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQL94Dialect
     hibernate:
       ddl-auto: update
+  http:
+    multipart:
+      max-file-size: 2MB
+      max-request-size: 15MB
 
 logging:
   level:
