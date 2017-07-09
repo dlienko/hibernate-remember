@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = PACKAGE)
 @AllArgsConstructor
 @Entity
-public class Exercise {
+public class ExerciseEntity {
 
     @Id
     @GeneratedValue

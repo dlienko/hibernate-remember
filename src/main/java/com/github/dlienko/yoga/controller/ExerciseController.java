@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.github.dlienko.yoga.controller.payload.CreateExercise;
-import com.github.dlienko.yoga.model.Exercise;
+import com.github.dlienko.yoga.model.ExerciseEntity;
 import com.github.dlienko.yoga.repository.ExerciseRepository;
 
 @RestController
@@ -42,19 +42,19 @@ public class ExerciseController {
     }
 
     @GetMapping
-    public Iterable<Exercise> getAll() {
+    public Iterable<ExerciseEntity> getAll() {
         return exerciseRepository.findAll();
     }
 
     @GetMapping(path = "/{id}")
-    public Exercise getById(@PathVariable(value = "id") Long id) {
+    public ExerciseEntity getById(@PathVariable(value = "id") Long id) {
         return exerciseRepository.findOne(id);
     }
 
     @PostMapping(consumes = APPLICATION_JSON_UTF8_VALUE)
     @ResponseStatus(CREATED)
-    public Exercise create(@RequestBody CreateExercise request) {
-        Exercise entity = Exercise.builder()
+    public ExerciseEntity create(@RequestBody CreateExercise request) {
+        ExerciseEntity entity = ExerciseEntity.builder()
                 .name(request.getName())
                 .description(request.getDescription())
                 .build();
@@ -65,8 +65,8 @@ public class ExerciseController {
     }
 
     @PutMapping(path = "/{id}", consumes = APPLICATION_JSON_UTF8_VALUE)
-    public Exercise update(@RequestBody CreateExercise request, @PathVariable(value = "id") Long id) {
-        Exercise entity = Exercise.builder()
+    public ExerciseEntity update(@RequestBody CreateExercise request, @PathVariable(value = "id") Long id) {
+        ExerciseEntity entity = ExerciseEntity.builder()
                 .id(id)
                 .name(request.getName())
                 .description(request.getDescription())
