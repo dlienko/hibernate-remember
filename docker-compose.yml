@@ -5,6 +5,7 @@ services:
     image: dlienko/yoga-db
     ports:
       - 8880:8080
+      - 5005:5005
     links:
       - db:db
     environment:
