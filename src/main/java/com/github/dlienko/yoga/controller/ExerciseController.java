@@ -1,11 +1,16 @@
 package com.github.dlienko.yoga.controller;
 
+import static com.github.dlienko.util.Streams.streamOf;
 import static java.lang.invoke.MethodHandles.lookup;
+import static java.util.stream.Collectors.toList;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,8 +28,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.github.dlienko.yoga.controller.payload.CreateExercise;
+import com.github.dlienko.yoga.controller.payload.Exercise;
 import com.github.dlienko.yoga.model.ExerciseEntity;
+import com.github.dlienko.yoga.model.ImageEntity;
 import com.github.dlienko.yoga.repository.ExerciseRepository;
+import com.github.dlienko.yoga.repository.ImageRepository;
 
 @RestController
 @RequestMapping(
@@ -35,33 +43,51 @@ public class ExerciseController {
     private final Logger log = getLogger(lookup().lookupClass());
 
     private final ExerciseRepository exerciseRepository;
+    private final ImageRepository imageRepository;
 
     @Autowired
-    public ExerciseController(ExerciseRepository exerciseRepository) {
+    public ExerciseController(
+            ExerciseRepository exerciseRepository,
+            ImageRepository imageRepository) {
         this.exerciseRepository = exerciseRepository;
+        this.imageRepository = imageRepository;
     }
 
     @GetMapping
-    public Iterable<ExerciseEntity> getAll() {
-        return exerciseRepository.findAll();
+    public List<Exercise> getAll() {
+        return streamOf(exerciseRepository.findAll())
+                .map(Exercise::of)
+                .collect(Collectors.toList());
     }
 
     @GetMapping(path = "/{id}")
-    public ExerciseEntity getById(@PathVariable(value = "id") Long id) {
-        return exerciseRepository.findOne(id);
+    public Exercise getById(@PathVariable(value = "id") Long id) {
+        return Exercise.of(exerciseRepository.findOne(id));
     }
 
     @PostMapping(consumes = APPLICATION_JSON_UTF8_VALUE)
     @ResponseStatus(CREATED)
-    public ExerciseEntity create(@RequestBody CreateExercise request) {
+    public Exercise create(@RequestBody CreateExercise request) {
         ExerciseEntity entity = ExerciseEntity.builder()
                 .name(request.getName())
                 .description(request.getDescription())
                 .build();
 
-        log.info("Inserting entity: {}", entity);
+        Iterable<ImageEntity> images = imageRepository.findAll(request.getImages());
 
-        return exerciseRepository.save(entity);
+        entity.setImages(streamOf(images).collect(toList()));
+
+        // TODO make transactional
+
+        log.info("Inserting entity: {}", entity.getName());
+        ExerciseEntity saved = exerciseRepository.save(entity);
+
+        images.forEach(image -> image.setExercise(saved));
+        log.info("Updating images with exercise id {}", saved.getId());
+        imageRepository.save(images);
+
+
+        return Exercise.of(saved);
     }
 
     @PutMapping(path = "/{id}", consumes = APPLICATION_JSON_UTF8_VALUE)

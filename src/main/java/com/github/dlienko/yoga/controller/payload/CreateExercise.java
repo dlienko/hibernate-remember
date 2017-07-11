@@ -1,5 +1,8 @@
 package com.github.dlienko.yoga.controller.payload;
 
+import java.util.List;
+import java.util.UUID;
+
 import javax.validation.constraints.NotNull;
 
 import lombok.Data;
@@ -12,5 +15,7 @@ public class CreateExercise {
 
     @NotNull
     String description;
+
+    List<UUID> images;
 
 }

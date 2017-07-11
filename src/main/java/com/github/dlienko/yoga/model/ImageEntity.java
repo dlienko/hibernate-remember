@@ -1,5 +1,6 @@
 package com.github.dlienko.yoga.model;
 
+import static javax.persistence.FetchType.LAZY;
 import static lombok.AccessLevel.PACKAGE;
 
 import java.util.UUID;
@@ -7,6 +8,9 @@ import java.util.UUID;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,6 +22,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = PACKAGE)
 @AllArgsConstructor
 @Entity
+@Table(name = "images")
 public class ImageEntity {
 
     @Id
@@ -29,4 +34,7 @@ public class ImageEntity {
     @Column(nullable = false)
     private byte[] bytes;
 
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "IMAGE_ID")
+    private ExerciseEntity exercise;
 }
