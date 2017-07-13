@@ -10,7 +10,6 @@ import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,9 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.github.dlienko.yoga.controller.payload.CreateExercise;
 import com.github.dlienko.yoga.controller.payload.Exercise;
 import com.github.dlienko.yoga.model.ExerciseEntity;
-import com.github.dlienko.yoga.model.ImageEntity;
-import com.github.dlienko.yoga.repository.ExerciseRepository;
-import com.github.dlienko.yoga.repository.ImageRepository;
+import com.github.dlienko.yoga.service.ExerciseService;
 
 @RestController
 @RequestMapping(
@@ -42,71 +39,43 @@ public class ExerciseController {
 
     private final Logger log = getLogger(lookup().lookupClass());
 
-    private final ExerciseRepository exerciseRepository;
-    private final ImageRepository imageRepository;
+    private final ExerciseService exerciseService;
 
     @Autowired
     public ExerciseController(
-            ExerciseRepository exerciseRepository,
-            ImageRepository imageRepository) {
-        this.exerciseRepository = exerciseRepository;
-        this.imageRepository = imageRepository;
+            ExerciseService exerciseService) {
+        this.exerciseService = exerciseService;
     }
 
     @GetMapping
-    public List<Exercise> getAll() {
-        return streamOf(exerciseRepository.findAll())
+    public List<Exercise> findAll() {
+        return streamOf(exerciseService.findAll())
                 .map(Exercise::of)
-                .collect(Collectors.toList());
+                .collect(toList());
     }
 
     @GetMapping(path = "/{id}")
-    public Exercise getById(@PathVariable(value = "id") Long id) {
-        return Exercise.of(exerciseRepository.findOne(id));
+    public Exercise findById(@PathVariable(value = "id") long id) {
+        return Exercise.of(exerciseService.findOne(id));
     }
 
     @PostMapping(consumes = APPLICATION_JSON_UTF8_VALUE)
     @ResponseStatus(CREATED)
     public Exercise create(@RequestBody CreateExercise request) {
-        ExerciseEntity entity = ExerciseEntity.builder()
-                .name(request.getName())
-                .description(request.getDescription())
-                .build();
-
-        Iterable<ImageEntity> images = imageRepository.findAll(request.getImages());
-
-        entity.setImages(streamOf(images).collect(toList()));
-
-        // TODO make transactional
-
-        log.info("Inserting entity: {}", entity.getName());
-        ExerciseEntity saved = exerciseRepository.save(entity);
-
-        images.forEach(image -> image.setExercise(saved));
-        log.info("Updating images with exercise id {}", saved.getId());
-        imageRepository.save(images);
-
-
-        return Exercise.of(saved);
+        ExerciseEntity exercise = exerciseService.createExercise(request);
+        return Exercise.of(exercise);
     }
 
     @PutMapping(path = "/{id}", consumes = APPLICATION_JSON_UTF8_VALUE)
-    public ExerciseEntity update(@RequestBody CreateExercise request, @PathVariable(value = "id") Long id) {
-        ExerciseEntity entity = ExerciseEntity.builder()
-                .id(id)
-                .name(request.getName())
-                .description(request.getDescription())
-                .build();
-
-        log.info("Updating entity: {}", entity);
-
-        return exerciseRepository.save(entity);
+    public Exercise update(@RequestBody CreateExercise request, @PathVariable(value = "id") long id) {
+        ExerciseEntity exercise = exerciseService.updateExercise(request, id);
+        return Exercise.of(exercise);
     }
 
     @DeleteMapping(path = "/{id}")
     @ResponseStatus(NO_CONTENT)
     public void delete(@PathVariable(value = "id") Long id) {
-        exerciseRepository.delete(id);
+        exerciseService.delete(id);
     }
 
     @ExceptionHandler(EmptyResultDataAccessException.class)

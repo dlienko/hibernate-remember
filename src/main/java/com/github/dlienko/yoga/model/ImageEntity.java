@@ -35,6 +35,6 @@ public class ImageEntity {
     private byte[] bytes;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "IMAGE_ID")
+    @JoinColumn(name = "EXERCISE_ID")
     private ExerciseEntity exercise;
 }
