@@ -22,7 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.github.dlienko.yoga.controller.payload.ErrorMessage;
 import com.github.dlienko.yoga.controller.payload.ErrorMessage.ErrorCode;
-import com.github.dlienko.yoga.converter.ImageEntityToMetaConverter;
+import com.github.dlienko.yoga.converter.CustomConversionService;
 import com.github.dlienko.yoga.model.ImageEntity;
 import com.github.dlienko.yoga.repository.ImageRepository;
 
@@ -33,14 +33,14 @@ public class ImageUploadController {
     private final Logger logger = getLogger(lookup().lookupClass());
 
     private final ImageRepository imageRepository;
-    private final ImageEntityToMetaConverter imageConverter;
+    private final CustomConversionService conversionService;
 
     @Autowired
     public ImageUploadController(
             ImageRepository imageRepository,
-            ImageEntityToMetaConverter imageConverter) {
+            CustomConversionService conversionService) {
         this.imageRepository = imageRepository;
-        this.imageConverter = imageConverter;
+        this.conversionService = conversionService;
     }
 
     @PostMapping(produces = APPLICATION_JSON_UTF8_VALUE)
@@ -59,7 +59,7 @@ public class ImageUploadController {
         try {
             ImageEntity savedImage = saveUploadedFile(file);
             return ResponseEntity.ok()
-                    .body(imageConverter.convert(savedImage));
+                    .body(conversionService.toImageMeta(savedImage));
         } catch (IOException e) {
             return ResponseEntity.badRequest()
                     .body(ErrorMessage.builder()
@@ -87,4 +87,5 @@ public class ImageUploadController {
                 .bytes(file.getBytes())
                 .build());
     }
+
 }
