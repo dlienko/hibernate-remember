@@ -1,18 +1,12 @@
 package com.github.dlienko.yoga.controller;
 
 import static java.lang.invoke.MethodHandles.lookup;
-import static java.util.Collections.singletonList;
-import static java.util.Collections.singletonMap;
 import static java.util.UUID.randomUUID;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
-
-import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.github.dlienko.yoga.controller.payload.ErrorMessage;
 import com.github.dlienko.yoga.controller.payload.ErrorMessage.ErrorCode;
+import com.github.dlienko.yoga.converter.ImageEntityToMetaConverter;
 import com.github.dlienko.yoga.model.ImageEntity;
 import com.github.dlienko.yoga.repository.ImageRepository;
 
@@ -38,10 +33,14 @@ public class ImageUploadController {
     private final Logger logger = getLogger(lookup().lookupClass());
 
     private final ImageRepository imageRepository;
+    private final ImageEntityToMetaConverter imageConverter;
 
     @Autowired
-    public ImageUploadController(ImageRepository imageRepository) {
+    public ImageUploadController(
+            ImageRepository imageRepository,
+            ImageEntityToMetaConverter imageConverter) {
         this.imageRepository = imageRepository;
+        this.imageConverter = imageConverter;
     }
 
     @PostMapping(produces = APPLICATION_JSON_UTF8_VALUE)
@@ -58,10 +57,9 @@ public class ImageUploadController {
         }
 
         try {
-            List<UUID> ids = saveUploadedFiles(singletonList(file));
-            // TODO return self-descriptive image
+            ImageEntity savedImage = saveUploadedFile(file);
             return ResponseEntity.ok()
-                    .body(singletonMap("files", ids));
+                    .body(imageConverter.convert(savedImage));
         } catch (IOException e) {
             return ResponseEntity.badRequest()
                     .body(ErrorMessage.builder()
@@ -72,7 +70,7 @@ public class ImageUploadController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> downloadFile(@PathVariable("id") UUID id, HttpServletResponse response) {
+    public ResponseEntity<?> downloadFile(@PathVariable("id") UUID id) {
         ImageEntity file = imageRepository.findOne(id);
 
         return ResponseEntity.ok()
@@ -81,24 +79,12 @@ public class ImageUploadController {
                 .body(file.getBytes());
     }
 
-    private List<UUID> saveUploadedFiles(List<MultipartFile> files) throws IOException {
-        // TODO do it with streams, write some nice utils
-        List<UUID> ids = new ArrayList<>();
-
-        for (MultipartFile file : files) {
-            if (file.isEmpty()) {
-                continue;
-            }
-
-            UUID id = randomUUID();
-            imageRepository.save(ImageEntity.builder()
-                    .id(id)
-                    .name(file.getOriginalFilename())
-                    .bytes(file.getBytes())
-                    .build());
-            ids.add(id);
-        }
-
-        return ids;
+    private ImageEntity saveUploadedFile(MultipartFile file) throws IOException {
+        UUID id = randomUUID();
+        return imageRepository.save(ImageEntity.builder()
+                .id(id)
+                .name(file.getOriginalFilename())
+                .bytes(file.getBytes())
+                .build());
     }
 }
