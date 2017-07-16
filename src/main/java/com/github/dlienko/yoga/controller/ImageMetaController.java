@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -47,6 +48,11 @@ public class ImageMetaController {
     public ImageMeta getById(@PathVariable("id")UUID id) {
         ImageEntity image = imageRepository.findOne(id);
         return conversionService.toImageMeta(image);
+    }
+
+    @DeleteMapping(path = "/{id}")
+    public void delete(@PathVariable("id") UUID id) {
+        imageRepository.delete(id);
     }
 
 }
