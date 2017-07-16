@@ -2,6 +2,7 @@ package com.github.dlienko.yoga.service;
 
 import static com.github.dlienko.util.Predicates.not;
 import static com.github.dlienko.util.Streams.streamOf;
+import static com.github.dlienko.util.Streams.streamOfNullable;
 import static java.lang.invoke.MethodHandles.lookup;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
@@ -54,7 +55,7 @@ public class ExerciseService {
                 .description(request.getDescription())
                 .build();
 
-        List<UUID> imageIds = request.getImages().stream()
+        List<UUID> imageIds = streamOfNullable(request.getImages())
                 .map(CreateImage::getImageId)
                 .collect(toList());
         Iterable<ImageEntity> images = imageRepository.findAll(imageIds);
@@ -79,7 +80,7 @@ public class ExerciseService {
                 .description(request.getDescription())
                 .build();
 
-        Set<UUID> newImageIds = request.getImages().stream()
+        Set<UUID> newImageIds = streamOfNullable(request.getImages())
                 .map(CreateImage::getImageId)
                 .collect(toSet());
         Iterable<ImageEntity> newImages = imageRepository.findAll(newImageIds);
