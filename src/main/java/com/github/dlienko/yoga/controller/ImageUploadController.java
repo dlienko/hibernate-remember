@@ -75,7 +75,7 @@ public class ImageUploadController {
 
         return ResponseEntity.ok()
                 // TODO determine and store content type on upload
-                .contentType(MediaType.valueOf("image/png"))
+                .contentType(MediaType.valueOf("image/jpg"))
                 .body(file.getBytes());
     }
 
