@@ -7,6 +7,7 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.github.dlienko.yoga.controller.payload.CreateExercise;
+import com.github.dlienko.yoga.controller.payload.CreateImage;
 import com.github.dlienko.yoga.model.ExerciseEntity;
 import com.github.dlienko.yoga.model.ImageEntity;
 import com.github.dlienko.yoga.repository.ExerciseRepository;
@@ -52,7 +54,10 @@ public class ExerciseService {
                 .description(request.getDescription())
                 .build();
 
-        Iterable<ImageEntity> images = imageRepository.findAll(request.getImages());
+        List<UUID> imageIds = request.getImages().stream()
+                .map(CreateImage::getImageId)
+                .collect(toList());
+        Iterable<ImageEntity> images = imageRepository.findAll(imageIds);
 
         entity.setImages(streamOf(images).collect(toList()));
 
@@ -74,9 +79,10 @@ public class ExerciseService {
                 .description(request.getDescription())
                 .build();
 
-        Iterable<ImageEntity> newImages = imageRepository.findAll(request.getImages());
-
-        Set<UUID> newImageIds = streamOf(newImages).map(ImageEntity::getId).collect(toSet());
+        Set<UUID> newImageIds = request.getImages().stream()
+                .map(CreateImage::getImageId)
+                .collect(toSet());
+        Iterable<ImageEntity> newImages = imageRepository.findAll(newImageIds);
 
         ExerciseEntity oldExercise = exerciseRepository.findOne(id);
 

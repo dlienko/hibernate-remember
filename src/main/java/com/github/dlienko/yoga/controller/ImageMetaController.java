@@ -45,7 +45,7 @@ public class ImageMetaController {
     }
 
     @GetMapping(path = "/{id}")
-    public ImageMeta getById(@PathVariable("id")UUID id) {
+    public ImageMeta getById(@PathVariable("id") UUID id) {
         ImageEntity image = imageRepository.findOne(id);
         return conversionService.toImageMeta(image);
     }

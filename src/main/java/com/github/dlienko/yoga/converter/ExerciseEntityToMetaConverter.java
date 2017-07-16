@@ -30,12 +30,12 @@ public class ExerciseEntityToMetaConverter implements Converter<ExerciseEntity, 
                 .map(conversionFunction(imageConverter))
                 .collect(toList());
 
-        return new Exercise(
-                exerciseEntity.getId(),
-                exerciseEntity.getName(),
-                exerciseEntity.getDescription(),
-                images
-        );
+        return Exercise.builder()
+                .id(exerciseEntity.getId())
+                .name(exerciseEntity.getName())
+                .description(exerciseEntity.getDescription())
+                .images(images)
+                .build();
     }
 
 }

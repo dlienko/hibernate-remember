@@ -1,7 +1,6 @@
 package com.github.dlienko.yoga.controller;
 
 import static com.github.dlienko.util.Streams.streamOf;
-import static com.github.dlienko.yoga.converter.CustomConversionService.conversionFunction;
 import static java.lang.invoke.MethodHandles.lookup;
 import static java.util.stream.Collectors.toList;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -55,7 +54,11 @@ public class ExerciseController {
     @GetMapping
     public List<Exercise> findAll() {
         return streamOf(exerciseService.findAll())
-                .map(conversionFunction(conversionService, Exercise.class))
+                .map(exerciseEntity -> Exercise.builder()
+                        .id(exerciseEntity.getId())
+                        .name(exerciseEntity.getName())
+                        .description(exerciseEntity.getDescription())
+                        .build())
                 .collect(toList());
     }
 
