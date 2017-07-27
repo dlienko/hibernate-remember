@@ -1,5 +1,6 @@
 package com.github.dlienko.yoga.model;
 
+import static javax.persistence.CascadeType.REMOVE;
 import static javax.persistence.FetchType.LAZY;
 import static lombok.AccessLevel.PACKAGE;
 
@@ -36,7 +37,7 @@ public class ExerciseEntity {
     private String description;
 
     // TODO ??? is it possible to fetch images in bulk when exercises are got in bulk?
-    @OneToMany(fetch = LAZY, mappedBy = "exercise")
+    @OneToMany(fetch = LAZY, mappedBy = "exercise", cascade = REMOVE)
     private List<ImageEntity> images;
 
 }
