@@ -1,5 +1,7 @@
 package com.github.dlienko.yoga.model;
 
+import static com.github.dlienko.yoga.common.Constants.EXERCISE_DESC_LENGTH;
+import static com.github.dlienko.yoga.common.Constants.EXERCISE_NAME_LENGTH;
 import static javax.persistence.CascadeType.REMOVE;
 import static javax.persistence.FetchType.LAZY;
 import static lombok.AccessLevel.PACKAGE;
@@ -30,10 +32,10 @@ public class ExerciseEntity {
     @GeneratedValue
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = EXERCISE_NAME_LENGTH)
     private String name;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = EXERCISE_DESC_LENGTH)
     private String description;
 
     // TODO ??? is it possible to fetch images in bulk when exercises are got in bulk?

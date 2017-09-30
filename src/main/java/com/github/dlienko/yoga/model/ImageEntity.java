@@ -1,5 +1,6 @@
 package com.github.dlienko.yoga.model;
 
+import static com.github.dlienko.yoga.common.Constants.IMAGE_NAME_LENGTH;
 import static javax.persistence.FetchType.LAZY;
 import static lombok.AccessLevel.PACKAGE;
 
@@ -28,7 +29,7 @@ public class ImageEntity {
     @Id
     private UUID id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = IMAGE_NAME_LENGTH)
     private String name;
 
     @Column(nullable = false)

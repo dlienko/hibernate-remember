@@ -30,7 +30,7 @@ import com.github.dlienko.yoga.repository.ImageRepository;
 @RequestMapping("/v1/images")
 public class ImageUploadController {
 
-    private final Logger logger = getLogger(lookup().lookupClass());
+    private final Logger log = getLogger(lookup().lookupClass());
 
     private final ImageRepository imageRepository;
     private final CustomConversionService conversionService;
@@ -46,7 +46,7 @@ public class ImageUploadController {
     @PostMapping(produces = APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<?> uploadFile(
             @RequestParam("file") MultipartFile file) {
-        logger.debug("Single file upload!");
+        log.debug("Single file upload!");
 
         if (file.isEmpty()) {
             return ResponseEntity.badRequest()

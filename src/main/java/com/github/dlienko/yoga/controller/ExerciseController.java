@@ -11,6 +11,8 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -69,13 +71,13 @@ public class ExerciseController {
 
     @PostMapping(consumes = APPLICATION_JSON_UTF8_VALUE)
     @ResponseStatus(CREATED)
-    public Exercise create(@RequestBody CreateExercise request) {
+    public Exercise create(@Valid @RequestBody CreateExercise request) {
         ExerciseEntity exercise = exerciseService.createExercise(request);
         return conversionService.toExercise(exercise);
     }
 
     @PutMapping(path = "/{id}", consumes = APPLICATION_JSON_UTF8_VALUE)
-    public Exercise update(@RequestBody CreateExercise request, @PathVariable(value = "id") long id) {
+    public Exercise update(@Valid @RequestBody CreateExercise request, @PathVariable(value = "id") long id) {
         ExerciseEntity exercise = exerciseService.updateExercise(request, id);
         return conversionService.toExercise(exercise);
     }

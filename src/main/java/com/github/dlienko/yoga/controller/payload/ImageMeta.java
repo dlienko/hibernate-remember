@@ -1,5 +1,6 @@
 package com.github.dlienko.yoga.controller.payload;
 
+import static com.github.dlienko.yoga.common.Constants.IMAGE_NAME_LENGTH;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
@@ -10,6 +11,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.Value;
 
+import org.hibernate.validator.constraints.Length;
 import org.springframework.hateoas.ResourceSupport;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -24,6 +26,7 @@ public class ImageMeta extends ResourceSupport {
     @JsonProperty("id")
     UUID imageId;
 
+    @Length(max = IMAGE_NAME_LENGTH)
     String name;
 
     @SuppressWarnings("unused")

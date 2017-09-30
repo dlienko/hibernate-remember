@@ -17,7 +17,8 @@ public class ErrorMessage {
 
     public enum ErrorCode {
         EMPTY_FILE,
-        UPLOAD_ERROR
+        UPLOAD_ERROR,
+        UPLOAD_FILE_TOO_LARGE
     }
 
 }
